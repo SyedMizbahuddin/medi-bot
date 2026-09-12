@@ -1,0 +1,26 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-format
+        name: ruff-format 
+        entry: ./backend/commit_format.sh
+        language: system
+        always_run: true
+        types: [ python ]
+        pass_filenames: false
+
+      - id: mypy-type-check
+        name: mypy-type-check
+        entry: uv run mypy .
+        language: system
+        always_run: true
+        types: [ python ]
+        pass_filenames: false
+      
+      - id: ruff-check
+        name: ruff-check 
+        entry: uv run ruff --config backend/ruff.toml check
+        language: system
+        always_run: true
+        types: [ python ]
+        pass_filenames: false

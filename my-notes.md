@@ -60,3 +60,18 @@ olny billing_exec and admin
  }
 
 # Frontend
+
+
+
+=====================================================
+
+Chunking + ingestion
+1. main in ingestion
+ingest a file
+ create chunks for that doc (with strategy here) -> 
+      use docling -> return chunks
+ generate embeddings for each chunk and store per file
+ populate it to the DB
+
+docling parse  + hybrid chunks
+2. 
