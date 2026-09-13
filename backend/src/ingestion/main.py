@@ -26,7 +26,6 @@ class IngenstionPipeline:
         chunks = self.document_processor.process(
             file_path=file, additional_metdata=additional_metdata
         )
-        print(chunks[0])
 
         return chunks
 
@@ -36,16 +35,12 @@ class IngenstionPipeline:
             source_collection = source_collection_dirs.name
             
             if source_collection.name == 'db':
-                #TODO
                 continue
 
             for file in source_collection_dirs.files or []:
                 chunks: list[Document] = self.chunk_document(
                     file, source_collection
                 )
-                # TODO
-                break
-            break
 
     def process(self):
         mediassist_folder: Directory = generate_file_directory(self.MEDIASSIST_DATA)

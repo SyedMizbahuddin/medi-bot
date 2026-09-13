@@ -21,14 +21,14 @@ class FileStore(Store):
         self.force = force
         
     
-    def _get_chunks_dir(self, file_path: Path) -> Path:
+    def _get_chunks_dir(self, file_path: Path, salt : str) -> Path:
         group = file_path.parent.name
                 
         group_dir = CHUNKS_DIR / group
         file_name = file_path.stem
         
         # chunk_data/embedding-model/nursing/infection_control/
-        file_chunk_dir = group_dir / file_name
+        file_chunk_dir = group_dir / file_name / salt
         file_chunk_dir.mkdir(
             parents=True, 
             exist_ok=True,
@@ -37,17 +37,17 @@ class FileStore(Store):
         return file_chunk_dir
     
     def _get_chunks_file(self, file_path : Path, salt : str) -> Path:
-        file_chunk_dir = self._get_chunks_dir(file_path)
+        file_chunk_dir = self._get_chunks_dir(file_path, salt)
         # chunk_data/embedding-model/nursing/infection_control/chunks.json
-        chunks_file = file_chunk_dir / salt / CHUNK_FILE
+        chunks_file = file_chunk_dir / CHUNK_FILE
         
         return chunks_file
             
     
     def _get_embeddings_file(self, file_path : Path, salt : str)  -> Path:
-        file_chunk_dir = self._get_chunks_dir(file_path)
+        file_chunk_dir = self._get_chunks_dir(file_path, salt)
         # chunk_data/embedding-model/nursing/infection_control/embeddings.json
-        embeddings_file = file_chunk_dir / salt / EMBEDDINGS_FILE
+        embeddings_file = file_chunk_dir / EMBEDDINGS_FILE
         
         return embeddings_file    
     
@@ -67,8 +67,6 @@ class FileStore(Store):
     def set_chunks(self, file_path : Path, salt : str, chunks: List[Document]) -> None:
         chunks_file = self._get_chunks_file(file_path, salt)
         
-        for i, chunk in enumerate(chunks):
-            chunk.id = file_path.stem + "_" + str(i)
 
         pd.DataFrame(
             list_document.dump_python(chunks,  mode='json')

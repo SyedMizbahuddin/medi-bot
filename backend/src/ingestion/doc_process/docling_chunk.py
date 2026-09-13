@@ -10,7 +10,7 @@ from docling_core.transforms.chunker.tokenizer.huggingface import HuggingFaceTok
 from docling_core.transforms.chunker.base import BaseChunker, BaseChunk
 from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
 from docling.datamodel.document import ConversionResult
-from hierarchical.postprocessor import ResultPostprocessor # type: ignore
+# from hierarchical.postprocessor import ResultPostprocessor # type: ignore
 from docling.document_converter import DocumentConverter
 
 import torch
@@ -24,19 +24,42 @@ class DoclingProccesor(DocumentProcessor):
     def __init__(self, store: Store):
         self._converter: DocumentConverter = DocumentConverter()
         self._chunker: BaseChunker = HybridChunker(
-            tokenizer=HuggingFaceTokenizer.from_pretrained(app_settings.EMBEDDING_MODEL)
+            tokenizer=HuggingFaceTokenizer.from_pretrained(app_settings.EMBEDDING_MODEL),
+            merge_peers=True
         )
         self._meta_extractor: BaseMetaExtractor = MetaExtractor()
         self.store: Store = store
 
     def _convert_to_docling(self, file_path: Path) -> ConversionResult:
         result: ConversionResult = self._converter.convert(source=file_path)
-        ResultPostprocessor(result).process()
+        # ResultPostprocessor(result).process()
         return result
 
     def _chunk_it(self, docling_document: DoclingDocument) -> list[BaseChunk]:
         chunks: list[BaseChunk] = list(self._chunker.chunk(docling_document))
         return chunks
+    
+    def _get_metadata(self, chunk: BaseChunk) -> dict[str, Any]:
+        chunk_meta = chunk.meta.export_json_dict()
+        labels = set()
+        pages = set()
+        for item in chunk_meta.get('doc_items', []):
+            if item.get('label'):
+                labels.add(item.get('label'))
+            
+            for p in item.get('prov', []):
+                if p.get('page_no'):
+                    pages.add(p.get('page_no'))
+        
+        
+        metadata = {}
+        metadata['headings'] = chunk_meta.get('headings', [])
+        metadata['section_title'] = metadata['headings'][-1] if len(metadata['headings']) > 0 else None
+        metadata['chunk_type'] = list(labels)[0] if len(labels) > 0 else None
+        metadata['page_number'] = list(pages)[0] if len(pages) > 0 else None
+        
+        return metadata
+        
 
     def _to_Langchain_Document(
         self,
@@ -45,14 +68,17 @@ class DoclingProccesor(DocumentProcessor):
         additional_metdata: dict[str, Any] = {},
     ) -> list[Document]:
         documents = []
-        for chunk in chunks:
-            meta_data: dict[str, Any] = self._meta_extractor.extract_chunk_meta(
-                file_path=str(file_path), chunk=chunk
-            )
-            meta_data.update(additional_metdata)
+        for ind, chunk in enumerate(chunks):
+            
+            metadata = self._get_metadata(chunk)
+            metadata['index'] = ind
+            metadata.update(additional_metdata)
+            
             documents.append(
                 Document(
-                    page_content=self._chunker.contextualize(chunk), meta_data=meta_data
+                    id=file_path.stem + "_" + str(ind),
+                    page_content=self._chunker.contextualize(chunk),
+                    metadata=metadata
                 )
             )
 
