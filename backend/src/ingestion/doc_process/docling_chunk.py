@@ -18,7 +18,7 @@ import torch
 torch.backends.mkldnn.enabled = False  # type: ignore
 
 
-class DoclingProccesor(DocumentProcessor):
+class DoclingProcessor(DocumentProcessor):
     SALT: str = 'docling'
 
     def __init__(self, store: Store):

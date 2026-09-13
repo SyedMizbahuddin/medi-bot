@@ -2,7 +2,7 @@ from src.utils.constants import accessible_roles, SourceCollection
 from src.ingestion.store.store import Store
 import argparse
 from src.ingestion.store.file_store import FileStore
-from src.ingestion.doc_process.docling_chunk import DoclingProccesor
+from src.ingestion.doc_process.docling_chunk import DoclingProcessor
 from langchain_core.documents import Document
 from src.helpers.ingestion_helper import generate_file_directory
 from src.ingestion.doc_process.document_processor import DocumentProcessor
@@ -10,7 +10,7 @@ from src.models.dir_file_model import Directory
 from pathlib import Path
 
 
-class IngenstionPipeline:
+class IngestionPipeline:
 
     def __init__(self, document_processor: DocumentProcessor):
         self.document_processor: DocumentProcessor = document_processor
@@ -60,8 +60,8 @@ def main() -> None:
     args = parser.parse_args()
     
     file_store: Store = FileStore(args.force)
-    docling_processor: DocumentProcessor = DoclingProccesor(store=file_store)
-    pipeline= IngenstionPipeline(document_processor=docling_processor)
+    docling_processor: DocumentProcessor = DoclingProcessor(store=file_store)
+    pipeline= IngestionPipeline(document_processor=docling_processor)
     
     pipeline.process()
 
