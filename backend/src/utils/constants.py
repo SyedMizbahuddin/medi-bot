@@ -46,15 +46,18 @@ ROLE_COLLECTIONS: dict[Role, set[SourceCollection]] = {
 
 
 def can_access(role: Role, collection: SourceCollection) -> bool:
+    """Return whether a role can access a source collection."""
     return collection in ROLE_COLLECTIONS.get(role, set())
 
 
 def accessible_collections(role: Role) -> list[str]:
+    """Return collection names accessible to a role."""
     return [c.value for c in ROLE_COLLECTIONS.get(role, set())]
 
 
 
 def accessible_roles(collection: SourceCollection) -> list[str]:
+    """Return role names allowed to access a collection."""
     return [
         role.value
         for role, collections in ROLE_COLLECTIONS.items()

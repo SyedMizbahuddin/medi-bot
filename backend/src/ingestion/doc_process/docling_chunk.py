@@ -1,3 +1,4 @@
+import logging
 from src.ingestion.doc_process.document_processor import DocumentProcessor
 from src.ingestion.store.store import Store
 from pathlib import Path
@@ -17,11 +18,14 @@ import torch
 
 torch.backends.mkldnn.enabled = False  # type: ignore
 
+logger = logging.getLogger(__name__)
+
 
 class DoclingProcessor(DocumentProcessor):
     SALT: str = 'docling'
 
     def __init__(self, store: Store):
+        """Initialize Docling conversion, chunking, metadata, and storage services."""
         self._converter: DocumentConverter = DocumentConverter()
         self._chunker: BaseChunker = HybridChunker(
             tokenizer=HuggingFaceTokenizer.from_pretrained(app_settings.EMBEDDING_MODEL),
@@ -31,15 +35,20 @@ class DoclingProcessor(DocumentProcessor):
         self.store: Store = store
 
     def _convert_to_docling(self, file_path: Path) -> ConversionResult:
+        """Convert a source file into a Docling document."""
+        logger.info("Converting document %s with Docling", file_path.name)
         result: ConversionResult = self._converter.convert(source=file_path)
         # ResultPostprocessor(result).process()
         return result
 
     def _chunk_it(self, docling_document: DoclingDocument) -> list[BaseChunk]:
+        """Split a Docling document into hybrid chunks."""
         chunks: list[BaseChunk] = list(self._chunker.chunk(docling_document))
+        logger.info("Created %d Docling chunks", len(chunks))
         return chunks
     
     def _get_metadata(self, chunk: BaseChunk) -> dict[str, Any]:
+        """Extract headings, labels, and page information from a chunk."""
         chunk_meta = chunk.meta.export_json_dict()
         labels = set()
         pages = set()
@@ -67,6 +76,7 @@ class DoclingProcessor(DocumentProcessor):
         file_path: Path,
         additional_metdata: dict[str, Any] = {},
     ) -> list[Document]:
+        """Convert Docling chunks into LangChain documents."""
         documents = []
         for ind, chunk in enumerate(chunks):
             
@@ -85,9 +95,11 @@ class DoclingProcessor(DocumentProcessor):
         return documents
 
     def process(self, file_path: Path, additional_metdata: dict[str, Any] = {},) -> list[Document]:
+        """Load cached chunks or convert, chunk, enrich, and cache a document."""
         
         cached_chunks = self.store.get_chunks(file_path=file_path, salt=self.SALT)
         if cached_chunks:
+            logger.info("Using cached chunks for %s", file_path.name)
             return cached_chunks
         
         result: ConversionResult = self._convert_to_docling(file_path=file_path)
@@ -97,6 +109,7 @@ class DoclingProcessor(DocumentProcessor):
         )
         
         self.store.set_chunks(file_path=file_path, salt=self.SALT, chunks=documents)
+        logger.info("Processed and cached %d chunks for %s", len(documents), file_path.name)
 
         return documents
 

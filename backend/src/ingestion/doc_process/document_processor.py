@@ -8,6 +8,7 @@ class DocumentProcessor(ABC):
     
     @abstractmethod
     def process(self, file_path: Path, additional_metdata: dict[str, Any] = {},) -> list[Document]:
+        """Process a source file into documents suitable for retrieval."""
         raise NotImplementedError()
          
     
