@@ -1,6 +1,6 @@
 import logging
 from pydantic import TypeAdapter
-from src.ingestion.store.store import Store
+from src.services.store.store import Store
 from langchain_core.documents import Document
 from typing import Optional, List
 from pathlib import Path

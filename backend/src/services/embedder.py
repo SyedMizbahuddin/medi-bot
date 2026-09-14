@@ -5,7 +5,7 @@ from src.config.app_config import app_settings
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
 from typing import List
-from src.ingestion.store.store import Store
+from src.services.store.store import Store
 
 logger = logging.getLogger(__name__)
 

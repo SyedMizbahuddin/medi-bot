@@ -1,13 +1,13 @@
 import logging
-from src.ingestion.embedder import Embedder
+from src.services.embedder import Embedder
 from src.utils.constants import accessible_roles, SourceCollection
-from src.ingestion.store.store import Store
+from src.services.store.store import Store
 import argparse
-from src.ingestion.store.file_store import FileStore
-from src.ingestion.doc_process.docling_chunk import DoclingProcessor
+from src.services.store.file_store import FileStore
+from src.services.doc_process.docling_chunk import DoclingProcessor
 from langchain_core.documents import Document
 from src.helpers.ingestion_helper import generate_file_directory
-from src.ingestion.doc_process.document_processor import DocumentProcessor
+from src.services.doc_process.document_processor import DocumentProcessor
 from src.models.dir_file_model import Directory
 from pathlib import Path
 
