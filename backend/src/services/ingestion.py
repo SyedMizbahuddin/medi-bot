@@ -66,6 +66,7 @@ class IngestionPipeline:
         """Discover the configured data directory and ingest its files."""
         logger.info("Starting ingestion from %s", self.MEDIASSIST_DATA)
         mediassist_folder: Directory = generate_file_directory(self.MEDIASSIST_DATA)
+        self.vector_db.init_collection()
         self.ingest_the_files(folder=mediassist_folder)
 
 

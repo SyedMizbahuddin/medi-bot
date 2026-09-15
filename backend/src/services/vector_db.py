@@ -26,9 +26,8 @@ class VectorDB:
         """Initialize a local Qdrant client and retain the dense embedder."""
         self._client = QdrantClient(path=str(DB_PATH))
         self._embedder = embedder
-        self._init_collection()
 
-    def _init_collection(self):
+    def init_collection(self):
         """Create the configured dense and sparse collection."""
         logger.info("Initializing Qdrant collection %s", app_settings.DB_COLLECTION)
         sample = self._embedder.embed_query("sample")
