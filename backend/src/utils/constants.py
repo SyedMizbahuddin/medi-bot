@@ -55,11 +55,6 @@ def accessible_collections(role: Role) -> list[str]:
     return [c.value for c in ROLE_COLLECTIONS.get(role, set())]
 
 
-
 def accessible_roles(collection: SourceCollection) -> list[str]:
     """Return role names allowed to access a collection."""
-    return [
-        role.value
-        for role, collections in ROLE_COLLECTIONS.items()
-        if collection in collections
-    ]
+    return [role.value for role, collections in ROLE_COLLECTIONS.items() if collection in collections]

@@ -1,3 +1,5 @@
+from src.services.vector_db import VectorDB
+from qdrant_client.http.models.models import SparseVector
 import logging
 from src.services.embedder import Embedder
 from src.utils.constants import accessible_roles, SourceCollection
@@ -14,19 +16,20 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(
-      level=logging.INFO,
-      format="%(asctime)s | %(levelname)-8s | %(name)-32s | %(message)s",
-  )
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)-8s | %(name)-32s | %(message)s",
+)
 
 for logger_name in ("httpx", "httpcore", "huggingface_hub", "transformers", "sentence_transformers"):
     logging.getLogger(logger_name).setLevel(logging.WARNING)
 
-class IngestionPipeline:
 
-    def __init__(self, document_processor: DocumentProcessor, embedder: Embedder):
+class IngestionPipeline:
+    def __init__(self, document_processor: DocumentProcessor, embedder: Embedder, vector_db: VectorDB):
         """Initialize the ingestion pipeline dependencies."""
         self.document_processor: DocumentProcessor = document_processor
         self.embedder: Embedder = embedder
+        self.vector_db: VectorDB = vector_db
         self.CURRENT_DIR: Path = Path().cwd()
         self.MEDIASSIST_DATA: Path = self.CURRENT_DIR.parent / "mediassist_data"
 
@@ -36,11 +39,9 @@ class IngestionPipeline:
         additional_metdata = {
             "source_document": file.name,
             "collection": dir.name,
-            "access_roles": accessible_roles(SourceCollection(dir.name))
+            "access_roles": accessible_roles(SourceCollection(dir.name)),
         }
-        chunks = self.document_processor.process(
-            file_path=file, additional_metdata=additional_metdata
-        )
+        chunks = self.document_processor.process(file_path=file, additional_metdata=additional_metdata)
 
         return chunks
 
@@ -49,24 +50,23 @@ class IngestionPipeline:
 
         for source_collection_dirs in folder.sub_dirs or []:
             source_collection = source_collection_dirs.name
-            
-            if source_collection.name == 'db':
+
+            if source_collection.name == "db":
                 continue
 
             for file in source_collection_dirs.files or []:
-                chunks: list[Document] = self.chunk_document(
-                    file, source_collection
-                )
-                
-                embeddings: list[list[float]] = self.embedder.embed(file, chunks)
+                chunks: list[Document] = self.chunk_document(file, source_collection)
+
+                embeddings: list[list[float]] = self.embedder.embed_file_chunks(file, chunks)
+                sparse_embeddings: list[SparseVector] = self.embedder.embed_file_chunks_sparse(file, chunks)
+
+                self.vector_db.add_documents(chunks, embeddings, sparse_embeddings)
 
     def process(self):
         """Discover the configured data directory and ingest its files."""
         logger.info("Starting ingestion from %s", self.MEDIASSIST_DATA)
         mediassist_folder: Directory = generate_file_directory(self.MEDIASSIST_DATA)
         self.ingest_the_files(folder=mediassist_folder)
-
-
 
 
 def main() -> None:
@@ -78,12 +78,13 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-    
+
     file_store: Store = FileStore(args.force)
     docling_processor: DocumentProcessor = DoclingProcessor(store=file_store)
     embedder = Embedder(file_store)
-    pipeline= IngestionPipeline(document_processor=docling_processor, embedder=embedder)
-    
+    vector_db = VectorDB(embedder=embedder)
+    pipeline = IngestionPipeline(document_processor=docling_processor, embedder=embedder, vector_db=vector_db)
+
     pipeline.process()
 
 

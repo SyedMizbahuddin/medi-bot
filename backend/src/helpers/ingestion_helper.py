@@ -10,12 +10,12 @@ def generate_file_directory(path: Path) -> Directory:
     logger.info("Scanning directory %s", path)
     sub_dirs = []
     files = []
-    
+
     for child in path.iterdir():
         if child.is_file():
             files.append(child)
-            
+
         if child.is_dir():
             sub_dirs.append(generate_file_directory(child))
-    
+
     return Directory(name=path, sub_dirs=sub_dirs, files=files)
