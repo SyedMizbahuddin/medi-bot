@@ -4,7 +4,6 @@ from src.services.store.store import Store
 from pathlib import Path
 from typing import Any
 from docling_core.types.doc.document import DoclingDocument
-from langchain_docling.loader import MetaExtractor, BaseMetaExtractor
 from langchain_core.documents import Document
 from src.config.app_config import app_settings
 from docling_core.transforms.chunker.tokenizer.huggingface import HuggingFaceTokenizer
@@ -31,7 +30,7 @@ class DoclingProcessor(DocumentProcessor):
         self._chunker: BaseChunker = HybridChunker(
             tokenizer=HuggingFaceTokenizer.from_pretrained(app_settings.EMBEDDING_MODEL), merge_peers=True
         )
-        self._meta_extractor: BaseMetaExtractor = MetaExtractor()
+
         self.store: Store = store
 
     def _convert_to_docling(self, file_path: Path) -> ConversionResult:

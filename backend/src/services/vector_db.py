@@ -22,14 +22,14 @@ logger = logging.getLogger(__name__)
 
 
 class VectorDB:
-    def __init__(self, embedder: Embedder):
+    def __init__(self, embedder: Embedder) -> None:
         """Initialize a local Qdrant client and retain the dense embedder."""
         self._client = QdrantClient(path=str(DB_PATH))
         self._embedder = embedder
 
-    def init_collection(self):
-        """Create the configured dense and sparse collection."""
-        logger.info("Initializing Qdrant collection %s", app_settings.DB_COLLECTION)
+    def recreate_collection(self) -> None:
+        """Recreate the Qdrant collection for a fresh ingestion run."""
+        logger.info("Recreating Qdrant collection %s", app_settings.DB_COLLECTION)
         sample = self._embedder.embed_query("sample")
 
         self._client.recreate_collection(
@@ -50,7 +50,7 @@ class VectorDB:
 
     def add_documents(
         self, documents: list[Document], embeddings: list[list[float]], sparse_embeddings: list[SparseVector]
-    ):
+    ) -> None:
         """Build and upsert dense and sparse vectors with document payloads."""
         logger.info("Preparing %d documents for Qdrant", len(documents))
         points = [

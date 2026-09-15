@@ -46,7 +46,7 @@ class FileStore(Store):
     def _get_chunks_file(self, file_path: Path, salt: str) -> Path:
         """Return the chunk cache path for a source file."""
         file_chunk_dir = self._get_chunks_dir(file_path, salt)
-        # chunk_data/embedding-model/nursing/infection_control/chunks.json
+        # chunk_data/embedding-model/nursing/infection_control/chunks.parquet
         chunks_file = file_chunk_dir / CHUNK_FILE
 
         return chunks_file
@@ -54,7 +54,7 @@ class FileStore(Store):
     def _get_embeddings_file(self, file_path: Path, salt: str) -> Path:
         """Return the embedding cache path for a source file."""
         file_chunk_dir = self._get_chunks_dir(file_path, salt)
-        # chunk_data/embedding-model/nursing/infection_control/embeddings.json
+        # chunk_data/embedding-model/nursing/infection_control/embeddings.npy
         embeddings_file = file_chunk_dir / EMBEDDINGS_FILE
 
         return embeddings_file
@@ -69,7 +69,7 @@ class FileStore(Store):
             file_path,
             salt,
         )
-
+        # chunk_data/embedding-model/nursing/infection_control/sparse_embeddings.parquet
         return file_chunk_dir / SPARSE_EMBEDDINGS_FILE
 
     def get_chunks(self, file_path: Path, salt: str) -> Optional[List[Document]]:

@@ -15,13 +15,6 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)-8s | %(name)-32s | %(message)s",
-)
-
-for logger_name in ("httpx", "httpcore", "huggingface_hub", "transformers", "sentence_transformers"):
-    logging.getLogger(logger_name).setLevel(logging.WARNING)
 
 
 class IngestionPipeline:
@@ -45,7 +38,7 @@ class IngestionPipeline:
 
         return chunks
 
-    def ingest_the_files(self, folder: Directory):
+    def ingest_the_files(self, folder: Directory) -> None:
         """Process supported files in each configured source collection."""
 
         for source_collection_dirs in folder.sub_dirs or []:
@@ -62,15 +55,24 @@ class IngestionPipeline:
 
                 self.vector_db.add_documents(chunks, embeddings, sparse_embeddings)
 
-    def process(self):
+    def process(self) -> None:
         """Discover the configured data directory and ingest its files."""
         logger.info("Starting ingestion from %s", self.MEDIASSIST_DATA)
         mediassist_folder: Directory = generate_file_directory(self.MEDIASSIST_DATA)
-        self.vector_db.init_collection()
+        self.vector_db.recreate_collection()
         self.ingest_the_files(folder=mediassist_folder)
 
 
 def main() -> None:
+    """Configure logging, parse CLI options, and run ingestion."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)-8s | %(name)-32s | %(message)s",
+    )
+
+    for logger_name in ("httpx", "httpcore", "huggingface_hub", "transformers", "sentence_transformers"):
+        logging.getLogger(logger_name).setLevel(logging.WARNING)
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--force",
