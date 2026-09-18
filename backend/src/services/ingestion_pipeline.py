@@ -3,10 +3,6 @@ from qdrant_client.http.models.models import SparseVector
 import logging
 from src.services.embedder import Embedder
 from src.utils.constants import accessible_roles, SourceCollection
-from src.services.store.store import Store
-import argparse
-from src.services.store.file_store import FileStore
-from src.services.doc_process.docling_chunk import DoclingProcessor
 from langchain_core.documents import Document
 from src.helpers.ingestion_helper import generate_file_directory
 from src.services.doc_process.document_processor import DocumentProcessor
@@ -63,33 +59,4 @@ class IngestionPipeline:
         self.ingest_the_files(folder=mediassist_folder)
 
 
-def main() -> None:
-    """Configure logging, parse CLI options, and run ingestion."""
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(levelname)-8s | %(name)-32s | %(message)s",
-    )
 
-    for logger_name in ("httpx", "httpcore", "huggingface_hub", "transformers", "sentence_transformers"):
-        logging.getLogger(logger_name).setLevel(logging.WARNING)
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--force",
-        action="store_true",
-        help="Use without force to use the cache",
-    )
-
-    args = parser.parse_args()
-
-    file_store: Store = FileStore(args.force)
-    docling_processor: DocumentProcessor = DoclingProcessor(store=file_store)
-    embedder = Embedder(file_store)
-    vector_db = VectorDB(embedder=embedder)
-    pipeline = IngestionPipeline(document_processor=docling_processor, embedder=embedder, vector_db=vector_db)
-
-    pipeline.process()
-
-
-if __name__ == "__main__":
-    main()

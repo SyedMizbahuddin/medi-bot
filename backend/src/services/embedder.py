@@ -24,7 +24,7 @@ class Embedder(HuggingFaceEmbeddings):
         self._store: Store = store
 
         self._sparse_model = SparseTextEmbedding(
-            model_name="Qdrant/bm25",
+            model_name=app_settings.SPARSE_EMBEDDING_MODEL,
         )
 
     def embed_file_chunks(self, file_path: Path, docs: List[Document]) -> list[list[float]]:
@@ -105,3 +105,12 @@ class Embedder(HuggingFaceEmbeddings):
         )
 
         return vectors
+
+    def embed_query_sparse(self, text: str) -> SparseVector:
+        embedding = list(self._sparse_model.embed([text]))[0]
+        vector = SparseVector(
+            indices=embedding.indices.astype(int).tolist(),
+            values=embedding.values.astype(float).tolist(),
+        )
+
+        return vector

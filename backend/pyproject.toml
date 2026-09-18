@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "dependency-injector>=4.49.1",
     "docling-hierarchical-pdf>=0.1.8",
     "fastparquet>=2026.5.0",
     "langchain>=1.4.0",

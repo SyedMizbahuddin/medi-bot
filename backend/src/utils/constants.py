@@ -45,6 +45,12 @@ ROLE_COLLECTIONS: dict[Role, set[SourceCollection]] = {
 }
 
 
+class RouteCategory(str, Enum):
+    SQL = 'sql'
+    VECTOR_DB = 'vector-db'
+
+
+
 def can_access(role: Role, collection: SourceCollection) -> bool:
     """Return whether a role can access a source collection."""
     return collection in ROLE_COLLECTIONS.get(role, set())

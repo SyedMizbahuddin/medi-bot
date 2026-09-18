@@ -1,3 +1,4 @@
+import shutil
 from qdrant_client.models import SparseVector
 import logging
 from pydantic import TypeAdapter
@@ -23,9 +24,9 @@ list_sparse_vector = TypeAdapter(List[SparseVector])
 
 
 class FileStore(Store):
-    def __init__(self, force: bool = False):
+    def __init__(self):
         """Initialize the file store, optionally bypassing existing cache files."""
-        self.force = force
+        pass
 
     def _get_chunks_dir(self, file_path: Path, salt: str) -> Path:
         """Return and create the cache directory for a source file."""
@@ -76,7 +77,7 @@ class FileStore(Store):
         """Load cached document chunks, or return None when unavailable."""
         chunks_file = self._get_chunks_file(file_path, salt)
 
-        if not chunks_file.is_file() or self.force:
+        if not chunks_file.is_file() :
             logger.info("Chunk cache miss for %s", file_path.name)
             return None
 
@@ -102,7 +103,7 @@ class FileStore(Store):
         """Load cached embeddings, or return None when unavailable."""
         embeddings_file = self._get_embeddings_file(file_path, salt)
 
-        if not embeddings_file.is_file() or self.force:
+        if not embeddings_file.is_file():
             logger.info("Embedding cache miss for %s", file_path.name)
             return None
 
@@ -132,7 +133,7 @@ class FileStore(Store):
             salt,
         )
 
-        if not embeddings_file.is_file() or self.force:
+        if not embeddings_file.is_file() :
             logger.info(
                 "Sparse embedding cache miss for %s",
                 file_path.name,
@@ -171,3 +172,11 @@ class FileStore(Store):
             len(embeddings),
             file_path.name,
         )
+    
+    
+    def clear_cache(self) -> None:
+        logger.info("Clearing cache")
+        if CHUNKS_DIR.exists():
+            shutil.rmtree(CHUNKS_DIR)
+        logger.info("Cleared cache")
+
