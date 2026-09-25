@@ -1,28 +1,25 @@
-from pydantic import PrivateAttr
-from fastembed import SparseTextEmbedding
+from fastembed import SparseTextEmbedding, TextEmbedding
 import logging
 from pathlib import Path
 from src.config.app_config import app_settings
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
 from typing import List
 from src.services.store.store import Store
 from qdrant_client.models import SparseVector
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
 
-class Embedder(HuggingFaceEmbeddings):
+class Embedder:
     SALT: str = "embedding"
 
-    _store: Store = PrivateAttr()
-    _sparse_model: SparseTextEmbedding = PrivateAttr()
 
     def __init__(self, store: Store):
         """Initialize the embedder with a persistence store."""
-        super().__init__(model=app_settings.EMBEDDING_MODEL)
         self._store: Store = store
 
+        self._dense_model = TextEmbedding(model_name=app_settings.EMBEDDING_MODEL)
         self._sparse_model = SparseTextEmbedding(
             model_name=app_settings.SPARSE_EMBEDDING_MODEL,
         )
@@ -42,7 +39,10 @@ class Embedder(HuggingFaceEmbeddings):
         logger.info("Creating embeddings for %d documents from %s", len(docs), file_path.name)
 
         texts = [doc.page_content for doc in docs]
-        vectors = self.embed_documents(texts)
+        vectors: list[list[float]] = [
+            embedding.astype(np.float32).tolist()
+            for embedding in self._dense_model.embed(texts)
+        ]
         self._store.set_embeddings(
             file_path=file_path,
             salt=self.SALT,
@@ -105,6 +105,13 @@ class Embedder(HuggingFaceEmbeddings):
         )
 
         return vectors
+    
+    
+    def embed_query(self, text: str) -> list[float]:
+        """Create a dense embedding for a single query string."""
+        embedding = next(iter(self._dense_model.embed([text])))
+
+        return embedding.tolist()
 
     def embed_query_sparse(self, text: str) -> SparseVector:
         embedding = list(self._sparse_model.embed([text]))[0]

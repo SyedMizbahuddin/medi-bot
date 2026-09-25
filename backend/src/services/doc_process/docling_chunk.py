@@ -1,3 +1,4 @@
+from src.utils.utils import get_point_id
 import logging
 from src.services.doc_process.document_processor import DocumentProcessor
 from src.services.store.store import Store
@@ -82,7 +83,7 @@ class DoclingProcessor(DocumentProcessor):
 
             documents.append(
                 Document(
-                    id=file_path.stem + "_" + str(ind),
+                    id=get_point_id(file_path.name, ind),
                     page_content=self._chunker.contextualize(chunk),
                     metadata=metadata,
                 )

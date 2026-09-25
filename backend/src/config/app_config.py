@@ -2,8 +2,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class _Settings(BaseSettings):
-    EMBEDDING_MODEL: str = ""
-    SPARSE_EMBEDDING_MODEL: str = ""
+    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
+    SPARSE_EMBEDDING_MODEL: str = "Qdrant/bm25"
+    CROSS_ENCODER_MODEL: str = 'jinaai/jina-reranker-v2-base-multilingual'
     DB_COLLECTION: str = "medi_vector_db"
     JWT_SECRET: str = "change-this-development-secret-32"
     JWT_ALGORITHM: str = "HS256"
