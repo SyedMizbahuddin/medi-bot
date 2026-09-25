@@ -4,6 +4,7 @@ from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Object, Singleton
 
 from src.services.api.auth_service import AuthService
+from src.services.api.chat_service import ChatService
 from src.services.rag.ingestion.doc_process.docling_chunk import DoclingProcessor
 from src.services.rag.core.embedder import Embedder
 from src.services.rag.ingestion.ingestion_pipeline import IngestionPipeline
@@ -62,3 +63,4 @@ class AppContainer(DeclarativeContainer):
         retriever=retriever,
         prompt_handler=prompt_handler,
     )
+    chat_service = Singleton(ChatService, medi_bot=medi_bot)

@@ -9,4 +9,4 @@ class SemanticRouter:
         pass
 
     def get_route(self, query: str, role: Role) -> RouteCategory:
-        return RouteCategory.SQL
+        return RouteCategory.VECTOR_DB

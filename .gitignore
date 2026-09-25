@@ -171,3 +171,4 @@ cython_debug/
 **/test/**
 
 vector_db
+sql_db

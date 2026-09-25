@@ -1,8 +1,20 @@
+from dataclasses import dataclass
+from typing import Any
+
 from src.services.rag.generate.prompt_handler import PromptHandler
 from src.services.rag.retrieve.retriever import Retriever
-from src.utils.constants import Role
+from src.utils.constants import Role, RouteCategory
 from src.services.rag.retrieve.semantic_router import SemanticRouter
 from src.services.rag.generate.llm_chat import LLMChat
+
+
+@dataclass
+class MediBotResult:
+    """Result returned by MediBot for API response formatting."""
+
+    answer: str
+    context: Any
+    category: RouteCategory
 
 
 class MediBot:
@@ -23,7 +35,7 @@ class MediBot:
         query: str,
         thread_id: str,
         role: Role,
-    ) -> str:
+    ) -> MediBotResult:
         route = self.semantic_router.get_route(query, role)
 
         context = self.retriever.query(
@@ -38,7 +50,13 @@ class MediBot:
             category=route,
         )
 
-        return self.chat_bot.chat(
+        answer = self.chat_bot.chat(
             prompt,
             thread_id,
+        )
+
+        return MediBotResult(
+            answer=answer,
+            context=context,
+            category=route,
         )
