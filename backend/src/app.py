@@ -2,12 +2,14 @@
 
 from fastapi import FastAPI
 
-from src.routes.auth import router as auth_router
-from src.routes.chat import router as chat_router
+from src import routes
+from src.config.container import AppContainer
+
+container = AppContainer()
+container.wire(packages=[routes])
 
 app = FastAPI(title="MediAssist API", version="0.1.0")
-app.include_router(auth_router)
-app.include_router(chat_router)
+app.include_router(routes.router)
 
 
 @app.get("/health")

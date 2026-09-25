@@ -2,20 +2,25 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from dependency_injector.wiring import Provide, inject
 
 import jwt
 
 from src.models.dto.auth import LoginRequest, LoginResponse
 from src.models.user import User
+from src.config.container import AppContainer
 from src.services.auth_service import AuthService
 from src.utils.constants import Role, accessible_collections
 
 router = APIRouter(tags=["auth"])
-auth_service = AuthService()
 security = HTTPBearer()
 
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> User:
+@inject
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    auth_service: AuthService = Depends(Provide[AppContainer.auth_service]),
+) -> User:
     """Validate the bearer token and return its authenticated user."""
     try:
         claims = auth_service.decode_access_token(credentials.credentials)
@@ -31,7 +36,11 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
 
 
 @router.post("/login", response_model=LoginResponse)
-def login(request: LoginRequest) -> LoginResponse:
+@inject
+def login(
+    request: LoginRequest,
+    auth_service: AuthService = Depends(Provide[AppContainer.auth_service]),
+) -> LoginResponse:
     """Authenticate credentials and return a 365-day JWT."""
     user = auth_service.authenticate(request.user_name, request.password)
     if user is None:
