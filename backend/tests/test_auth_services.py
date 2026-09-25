@@ -34,13 +34,13 @@ def test_sqlite_db_creates_parent_and_named_rows(tmp_path: Path) -> None:
 def test_user_service_seeds_and_authenticates_users(tmp_path: Path) -> None:
     sqlite_db, user_service, _ = build_services(tmp_path)
 
-    admin = user_service.get_user("admin")
-    doctor = user_service.authenticate("doctor", "doctor")
+    admin = user_service.get_user("admin.sys")
+    doctor = user_service.authenticate("dr.mehta", "doctor")
     created = User(user_name="nurse-user", password="secret", roles=[Role.NURSE])
     user_service.create_user(created)
 
     assert admin is not None
-    assert set(admin.roles) == set(Role)
+    assert admin.roles == [Role.ADMIN]
     assert doctor is not None
     assert doctor.roles == [Role.DOCTOR]
     assert user_service.authenticate("doctor", "wrong") is None
@@ -59,16 +59,16 @@ def test_user_service_seeds_and_authenticates_users(tmp_path: Path) -> None:
 
 def test_auth_service_delegates_and_preserves_jwt_claims(tmp_path: Path) -> None:
     _, user_service, auth_service = build_services(tmp_path)
-    user = user_service.get_user("doctor")
+    user = user_service.get_user("dr.mehta")
 
     assert user is not None
-    assert auth_service.authenticate("doctor", "doctor") == user
+    assert auth_service.authenticate("dr.mehta", "doctor") == user
     assert not hasattr(auth_service, "sqlite_db")
 
     token = auth_service.create_access_token(user)
     claims = auth_service.decode_access_token(token)
 
-    assert claims["sub"] == "doctor"
-    assert claims["user_name"] == "doctor"
+    assert claims["sub"] == "dr.mehta"
+    assert claims["user_name"] == "dr.mehta"
     assert claims["roles"] == [Role.DOCTOR.value]
     assert claims["exp"] - claims["iat"] == app_settings.JWT_EXPIRY_DAYS * 24 * 60 * 60

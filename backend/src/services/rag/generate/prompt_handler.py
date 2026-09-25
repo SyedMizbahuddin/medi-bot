@@ -1,22 +1,60 @@
-from src.utils.constants import RouteCategory
-from langchain_core.documents import Document
 from typing import Any
+
+from langchain_core.documents import Document
 from langchain_core.prompts import PromptTemplate
+
+from src.helpers.prompt_templates import (
+    CONTINUATION_PROMPT,
+    SQL_PROMPT,
+    VECTOR_DB_PROMPT,
+)
+from src.utils.constants import RouteCategory
 
 
 class PromptHandler:
+    """Build prompts for each supported RAG route."""
+
     def __init__(self) -> None:
-        self._sql_prompt_template: PromptTemplate = PromptTemplate.from_template("this is sql prompt")
-        self._vector_prompt_template: PromptTemplate = PromptTemplate.from_template("this is vector prompt")
-        self._continuation_template: PromptTemplate = PromptTemplate.from_template("this is continuation prompt")
+        """Initialize the route-specific prompt templates."""
+        self._sql_prompt_template = PromptTemplate.from_template(SQL_PROMPT)
+        self._vector_prompt_template = PromptTemplate.from_template(VECTOR_DB_PROMPT)
+        self._continuation_template = PromptTemplate.from_template(CONTINUATION_PROMPT)
 
     def sql_prompt(self, query: str, context: Any) -> str:
+        """Create a prompt for an analytical SQL-RAG response."""
         return self._sql_prompt_template.invoke({"query": query, "context": context}).to_string()
 
     def vector_db_prompt(self, query: str, context: list[Document]) -> str:
-        return self._vector_prompt_template.invoke({"query": query, "context": context}).to_string()
+        """Create a prompt containing each retrieved document and its metadata."""
+        context_blocks = []
+        for index, document in enumerate(context, start=1):
+            metadata = document.metadata
+            source_document = metadata.get("source_document", "Unknown document")
+            section_title = metadata.get("section_title")
+            if section_title is None:
+                section_titles = metadata.get("section_titles", [])
+                section_title = "; ".join(str(title) for title in section_titles if title)
+
+            collection = metadata.get("collection", "Unknown collection")
+            context_blocks.append(
+                "\n".join(
+                    [
+                        f"[Context {index}]",
+                        f"Source document: {source_document}",
+                        f"Section: {section_title or 'Unknown section'}",
+                        f"Collection: {collection}",
+                        f"Content:\n{document.page_content}",
+                    ]
+                )
+            )
+
+        formatted_context = "\n\n".join(context_blocks) or "No retrieved context was found."
+        return self._vector_prompt_template.invoke(
+            {"query": query, "context": formatted_context}
+        ).to_string()
 
     def continuation_prompt(self, query: str, context: Any) -> str:
+        """Create a prompt for a follow-up question."""
         return self._continuation_template.invoke({"query": query, "context": context}).to_string()
 
     def get_prompt(
@@ -25,6 +63,7 @@ class PromptHandler:
         context: Any,
         category: RouteCategory,
     ) -> str:
+        """Build a prompt using the handler for the selected route."""
         handler = {
             RouteCategory.SQL: self.sql_prompt,
             RouteCategory.VECTOR_DB: self.vector_db_prompt,
