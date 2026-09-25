@@ -1,4 +1,5 @@
 """User persistence and credential management."""
+from src.helpers.users import DUMMY_USERS
 
 import base64
 import hashlib
@@ -36,10 +37,7 @@ class UserService:
 
     def _seed_users(self) -> None:
         """Create default users without overwriting existing users."""
-        default_users = [
-            User(user_name="admin", password="admin", roles=list(Role)),
-            User(user_name="doctor", password="doctor", roles=[Role.DOCTOR]),
-        ]
+        default_users = DUMMY_USERS
         for user in default_users:
             if self.get_user(user.user_name) is None:
                 self.create_user(user)
