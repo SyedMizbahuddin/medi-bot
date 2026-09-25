@@ -1,10 +1,9 @@
+from src.services.sqlite_db import SQLiteDB
+
 
 class LLMChat:
-    
-    def __init__(self):
-        pass
-    
-    def chat(self, query: str, thread_id : str):
-        pass
-    
-    
+    def __init__(self, sql_db: SQLiteDB):
+        self.sql_db = sql_db
+
+    def chat(self, prompt: str, thread_id: str) -> str:
+        return ""
