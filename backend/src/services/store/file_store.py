@@ -24,7 +24,7 @@ list_sparse_vector = TypeAdapter(List[SparseVector])
 
 
 class FileStore(Store):
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the file store, optionally bypassing existing cache files."""
         pass
 

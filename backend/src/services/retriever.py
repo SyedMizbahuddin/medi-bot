@@ -33,7 +33,7 @@ class Retriever:
         self,
         query: str,
         retrieved_docs: list[Document],
-    ): 
+    )-> list[Document]: 
         content_hits = [doc.page_content for doc in retrieved_docs]
         new_scores = list(
             self.reranker.rerank(query, content_hits)

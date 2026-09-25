@@ -5,7 +5,7 @@ from langchain_core.prompts import PromptTemplate
 
 
 class PromptHandler:
-    def __init__(self):
+    def __init__(self) -> None:
         self._sql_prompt_template: PromptTemplate = PromptTemplate.from_template("this is sql prompt")
         self._vector_prompt_template: PromptTemplate = PromptTemplate.from_template("this is vector prompt")
         self._continuation_template: PromptTemplate = PromptTemplate.from_template("this is continuation prompt")
