@@ -46,9 +46,9 @@ ROLE_COLLECTIONS: dict[Role, set[SourceCollection]] = {
 
 
 class RouteCategory(str, Enum):
-    SQL = 'sql'
-    VECTOR_DB = 'vector-db'
-
+    SQL = "sql"
+    VECTOR_DB = "vector-db"
+    FOLLOW_UP = "follow-up"
 
 
 def can_access(role: Role, collection: SourceCollection) -> bool:

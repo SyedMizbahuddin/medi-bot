@@ -77,7 +77,7 @@ class FileStore(Store):
         """Load cached document chunks, or return None when unavailable."""
         chunks_file = self._get_chunks_file(file_path, salt)
 
-        if not chunks_file.is_file() :
+        if not chunks_file.is_file():
             logger.info("Chunk cache miss for %s", file_path.name)
             return None
 
@@ -133,7 +133,7 @@ class FileStore(Store):
             salt,
         )
 
-        if not embeddings_file.is_file() :
+        if not embeddings_file.is_file():
             logger.info(
                 "Sparse embedding cache miss for %s",
                 file_path.name,
@@ -172,11 +172,9 @@ class FileStore(Store):
             len(embeddings),
             file_path.name,
         )
-    
-    
+
     def clear_cache(self) -> None:
         logger.info("Clearing cache")
         if CHUNKS_DIR.exists():
             shutil.rmtree(CHUNKS_DIR)
         logger.info("Cleared cache")
-

@@ -12,7 +12,6 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-
 class IngestionPipeline:
     def __init__(self, document_processor: DocumentProcessor, embedder: Embedder, vector_db: VectorDB):
         """Initialize the ingestion pipeline dependencies."""
@@ -57,6 +56,3 @@ class IngestionPipeline:
         mediassist_folder: Directory = generate_file_directory(self.MEDIASSIST_DATA)
         self.vector_db.recreate_collection()
         self.ingest_the_files(folder=mediassist_folder)
-
-
-

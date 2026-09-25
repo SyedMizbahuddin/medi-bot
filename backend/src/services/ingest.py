@@ -1,4 +1,4 @@
-from src.config.container import Appcontainer
+from src.config.container import AppContainer
 import argparse
 import logging
 
@@ -22,10 +22,10 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    container = Appcontainer()
-    if (args.force):
+    container = AppContainer()
+    if args.force:
         container.file_store().clear_cache()
-        
+
     pipeline = container.ingestion_pipeline()
 
     pipeline.process()

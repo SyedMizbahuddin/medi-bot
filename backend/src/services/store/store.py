@@ -42,7 +42,7 @@ class Store(ABC):
         embeddings: list[SparseVector],
     ) -> None:
         raise NotImplementedError()
-    
+
     @abstractmethod
     def clear_cache(self) -> None:
         raise NotImplementedError()
