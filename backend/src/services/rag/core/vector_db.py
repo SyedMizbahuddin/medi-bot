@@ -18,7 +18,7 @@ from qdrant_client.models import (
     FieldCondition,
     MatchAny,
 )
-from src.services.embedder import Embedder
+from src.services.rag.core.embedder import Embedder
 from src.config.app_config import app_settings
 from pathlib import Path
 from qdrant_client import QdrantClient

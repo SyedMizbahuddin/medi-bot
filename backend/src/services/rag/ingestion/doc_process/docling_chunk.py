@@ -1,7 +1,7 @@
 from src.utils.utils import get_point_id
 import logging
-from src.services.doc_process.document_processor import DocumentProcessor
-from src.services.store.store import Store
+from src.services.rag.ingestion.doc_process.document_processor import DocumentProcessor
+from src.services.rag.core.store.store import Store
 from pathlib import Path
 from typing import Any
 from docling_core.types.doc.document import DoclingDocument

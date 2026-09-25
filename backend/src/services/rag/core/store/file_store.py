@@ -2,7 +2,7 @@ import shutil
 from qdrant_client.models import SparseVector
 import logging
 from pydantic import TypeAdapter
-from src.services.store.store import Store
+from src.services.rag.core.store.store import Store
 from langchain_core.documents import Document
 from typing import Optional, List
 from pathlib import Path

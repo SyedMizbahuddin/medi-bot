@@ -1,11 +1,11 @@
-from src.services.vector_db import VectorDB
+from src.services.rag.core.vector_db import VectorDB
 from qdrant_client.http.models.models import SparseVector
 import logging
-from src.services.embedder import Embedder
+from src.services.rag.core.embedder import Embedder
 from src.utils.constants import accessible_roles, SourceCollection
 from langchain_core.documents import Document
 from src.helpers.ingestion_helper import generate_file_directory
-from src.services.doc_process.document_processor import DocumentProcessor
+from src.services.rag.ingestion.doc_process.document_processor import DocumentProcessor
 from src.models.dir_file_model import Directory
 from pathlib import Path
 

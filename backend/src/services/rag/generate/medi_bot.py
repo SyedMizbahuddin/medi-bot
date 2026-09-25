@@ -1,8 +1,8 @@
-from src.services.prompt_handler import PromptHandler
-from src.services.retriever import Retriever
+from src.services.rag.generate.prompt_handler import PromptHandler
+from src.services.rag.retrieve.retriever import Retriever
 from src.utils.constants import Role
-from src.services.semantic_router import SemanticRouter
-from src.services.llm_chat import LLMChat
+from src.services.rag.retrieve.semantic_router import SemanticRouter
+from src.services.rag.generate.llm_chat import LLMChat
 
 
 class MediBot:

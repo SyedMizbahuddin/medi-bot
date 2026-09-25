@@ -9,7 +9,7 @@ import jwt
 from src.models.dto.auth import LoginRequest, LoginResponse
 from src.models.user import User
 from src.config.container import AppContainer
-from src.services.auth_service import AuthService
+from src.services.api.auth_service import AuthService
 from src.utils.constants import Role, accessible_collections
 
 router = APIRouter(tags=["auth"])

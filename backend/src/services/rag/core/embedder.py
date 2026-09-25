@@ -4,7 +4,7 @@ from pathlib import Path
 from src.config.app_config import app_settings
 from langchain_core.documents import Document
 from typing import List
-from src.services.store.store import Store
+from src.services.rag.core.store.store import Store
 from qdrant_client.models import SparseVector
 import numpy as np
 

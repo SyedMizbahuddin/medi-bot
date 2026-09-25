@@ -1,10 +1,10 @@
 from src.config.app_config import app_settings
 from typing import Any
-from src.services.sql_rag_agent import SqlRAG
+from src.services.rag.retrieve.sql_rag_agent import SqlRAG
 from src.utils.constants import Role, RouteCategory
 from langchain_core.documents import Document
 from src.services.sqlite_db import SQLiteDB
-from src.services.vector_db import VectorDB
+from src.services.rag.core.vector_db import VectorDB
 from fastembed.rerank.cross_encoder import TextCrossEncoder
 
 class Retriever:

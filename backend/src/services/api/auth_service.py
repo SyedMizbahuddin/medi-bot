@@ -7,7 +7,7 @@ import jwt
 
 from src.config.app_config import app_settings
 from src.models.user import User
-from src.services.user_service import UserService
+from src.services.api.user_service import UserService
 
 
 class AuthService:

@@ -3,20 +3,20 @@ from pathlib import Path
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Object, Singleton
 
-from src.services.auth_service import AuthService
-from src.services.doc_process.docling_chunk import DoclingProcessor
-from src.services.embedder import Embedder
-from src.services.ingestion_pipeline import IngestionPipeline
-from src.services.llm_chat import LLMChat
-from src.services.medi_bot import MediBot
-from src.services.prompt_handler import PromptHandler
-from src.services.retriever import Retriever
-from src.services.semantic_router import SemanticRouter
-from src.services.sql_rag_agent import SqlRAG
-from src.services.store.file_store import FileStore
+from src.services.api.auth_service import AuthService
+from src.services.rag.ingestion.doc_process.docling_chunk import DoclingProcessor
+from src.services.rag.core.embedder import Embedder
+from src.services.rag.ingestion.ingestion_pipeline import IngestionPipeline
+from src.services.rag.generate.llm_chat import LLMChat
+from src.services.rag.generate.medi_bot import MediBot
+from src.services.rag.generate.prompt_handler import PromptHandler
+from src.services.rag.retrieve.retriever import Retriever
+from src.services.rag.retrieve.semantic_router import SemanticRouter
+from src.services.rag.retrieve.sql_rag_agent import SqlRAG
+from src.services.rag.core.store.file_store import FileStore
 from src.services.sqlite_db import SQLiteDB
-from src.services.user_service import UserService
-from src.services.vector_db import VectorDB
+from src.services.api.user_service import UserService
+from src.services.rag.core.vector_db import VectorDB
 
 
 db_path = Path.cwd().parent / "sql_db" / "users.sqlite3"

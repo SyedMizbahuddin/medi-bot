@@ -4,9 +4,9 @@ from pathlib import Path
 
 from src.config.app_config import app_settings
 from src.models.user import User
-from src.services.auth_service import AuthService
+from src.services.api.auth_service import AuthService
 from src.services.sqlite_db import SQLiteDB
-from src.services.user_service import UserService
+from src.services.api.user_service import UserService
 from src.utils.constants import Role
 
 
