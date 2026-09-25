@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 
 
 from src.config.app_config import app_settings
@@ -9,14 +10,14 @@ from src.services.user_service import UserService
 from src.utils.constants import Role
 
 
-def build_services(tmp_path):
+def build_services(tmp_path: Path) -> tuple[SQLiteDB, UserService, AuthService]:
     sqlite_db = SQLiteDB(tmp_path / "users.sqlite3")
     user_service = UserService(sqlite_db)
     auth_service = AuthService(user_service)
     return sqlite_db, user_service, auth_service
 
 
-def test_sqlite_db_creates_parent_and_named_rows(tmp_path):
+def test_sqlite_db_creates_parent_and_named_rows(tmp_path: Path) -> None:
     database_path = tmp_path / "nested" / "users.sqlite3"
     sqlite_db = SQLiteDB(database_path)
 
@@ -30,7 +31,7 @@ def test_sqlite_db_creates_parent_and_named_rows(tmp_path):
     assert row["name"] == "one"
 
 
-def test_user_service_seeds_and_authenticates_users(tmp_path):
+def test_user_service_seeds_and_authenticates_users(tmp_path: Path) -> None:
     sqlite_db, user_service, _ = build_services(tmp_path)
 
     admin = user_service.get_user("admin")
@@ -56,7 +57,7 @@ def test_user_service_seeds_and_authenticates_users(tmp_path):
     assert password_hash != "secret"
 
 
-def test_auth_service_delegates_and_preserves_jwt_claims(tmp_path):
+def test_auth_service_delegates_and_preserves_jwt_claims(tmp_path: Path) -> None:
     _, user_service, auth_service = build_services(tmp_path)
     user = user_service.get_user("doctor")
 
