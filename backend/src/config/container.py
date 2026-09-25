@@ -1,3 +1,4 @@
+from src.services.auth_service import AuthService
 from src.services.ingestion_pipeline import IngestionPipeline
 from src.services.vector_db import VectorDB
 from src.services.doc_process.docling_chunk import DoclingProcessor
@@ -8,6 +9,7 @@ from dependency_injector.containers import DeclarativeContainer
 
 
 class Appcontainer(DeclarativeContainer):
+    auth_service = Singleton(AuthService)
     file_store = Singleton(FileStore)
     embedder = Singleton(Embedder, store=file_store)
     docling_proccesor = Singleton(DoclingProcessor, store=file_store)

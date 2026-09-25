@@ -2,13 +2,13 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel, Field
 
 import jwt
 
+from src.models.dto.auth import LoginRequest, LoginResponse
 from src.models.user import User
 from src.services.auth_service import AuthService
-from src.utils.constants import Role
+from src.utils.constants import Role, accessible_collections
 
 router = APIRouter(tags=["auth"])
 auth_service = AuthService()
@@ -30,23 +30,6 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         ) from error
 
 
-
-class LoginRequest(BaseModel):
-    """Credentials submitted by a user."""
-
-    user_name: str = Field(min_length=1)
-    password: str = Field(min_length=1)
-
-
-class LoginResponse(BaseModel):
-    """JWT access token and authenticated user roles."""
-
-    access_token: str
-    token_type: str = "bearer"
-    user_name: str
-    roles: list[Role]
-
-
 @router.post("/login", response_model=LoginResponse)
 def login(request: LoginRequest) -> LoginResponse:
     """Authenticate credentials and return a 365-day JWT."""
@@ -63,3 +46,9 @@ def login(request: LoginRequest) -> LoginResponse:
         user_name=user.user_name,
         roles=user.roles,
     )
+
+
+@router.get("/collections/{role}", response_model=list[str])
+def collections(role: Role) -> list[str]:
+    """Return collections accessible to the requested role."""
+    return accessible_collections(role)
