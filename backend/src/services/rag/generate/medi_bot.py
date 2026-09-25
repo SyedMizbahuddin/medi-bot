@@ -53,6 +53,7 @@ class MediBot:
         answer = self.chat_bot.chat(
             prompt,
             thread_id,
+            role
         )
 
         return MediBotResult(

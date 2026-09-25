@@ -14,6 +14,6 @@ class SQLiteDB:
 
     def connect(self) -> sqlite3.Connection:
         """Open a row-aware SQLite connection."""
-        connection = sqlite3.connect(self.db_path)
+        connection = sqlite3.connect(self.db_path , check_same_thread=False)
         connection.row_factory = sqlite3.Row
         return connection

@@ -29,4 +29,5 @@ dependencies = [
     "torch>=2.14.0",
     "uvicorn[standard]>=0.30.0",
     "pydash>=8.1.0",
+    "langgraph-checkpoint-sqlite>=3.1.1",
 ]

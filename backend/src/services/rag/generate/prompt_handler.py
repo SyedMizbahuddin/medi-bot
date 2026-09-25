@@ -27,13 +27,17 @@ class PromptHandler:
     def vector_db_prompt(self, query: str, context: list[Document]) -> str:
         """Create a prompt containing each retrieved document and its metadata."""
         context_blocks = []
-        for index, document in enumerate(context, start=1):
+        for index, document in enumerate(context[:4], start=1): # max 4
             metadata = document.metadata
             source_document = metadata.get("source_document", "Unknown document")
             section_title = metadata.get("section_title")
             if section_title is None:
                 section_titles = metadata.get("section_titles", [])
                 section_title = "; ".join(str(title) for title in section_titles if title)
+            indices = metadata.get("index")
+            if indices is None:
+                indices = metadata.get('indices',[])
+                indices = ','.join(str(ind) for ind in indices)
 
             collection = metadata.get("collection", "Unknown collection")
             context_blocks.append(
@@ -42,6 +46,7 @@ class PromptHandler:
                         f"[Context {index}]",
                         f"Source document: {source_document}",
                         f"Section: {section_title or 'Unknown section'}",
+                        f"chunk_indices: {indices or 'Unknown chunk indices'}",
                         f"Collection: {collection}",
                         f"Content:\n{document.page_content}",
                     ]

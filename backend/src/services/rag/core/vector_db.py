@@ -1,3 +1,4 @@
+from typing import Optional
 from src.utils.utils import get_point_id
 from pydash import get
 from qdrant_client.http.models.models import ScoredPoint, Record
@@ -16,7 +17,7 @@ from qdrant_client.models import (
     Prefetch,
     Filter,
     FieldCondition,
-    MatchAny,
+    MatchAny, HasIdCondition,
 )
 from src.services.rag.core.embedder import Embedder
 from src.config.app_config import app_settings
@@ -47,6 +48,7 @@ class VectorDB:
             sparse_vectors_config={"sparse": SparseVectorParams(modifier=Modifier.IDF)},
         )
         logger.info("Initialized Qdrant collection %s", app_settings.DB_COLLECTION)
+        #TODO indexing
 
     def _create_point_id(self, ind: int, doc: Document) -> str:
         """Create a deterministic point ID for a document chunk."""
@@ -216,7 +218,7 @@ class VectorDB:
                         page_content=combined_content,
                         metadata={
                             "source_document": source_document,
-                            "merged_indices": run,
+                            "indices": run,
                             "section_titles": section_titles,
                             "collection": collection,
                         },
@@ -224,3 +226,29 @@ class VectorDB:
                 )
 
         return enriched_docs
+    
+
+    def retrieve_chunk(
+        self, source_document: str, index: int, role: Role
+    ) -> Optional[Record]:
+        point_id = get_point_id(source_document, index)
+
+        scroll_filter = Filter(
+            must=[
+                HasIdCondition(has_id=[point_id]),
+                FieldCondition(
+                    key="access_roles",
+                    match=MatchAny(any=[role.value]),
+                ),
+            ]
+        )
+
+        points, _ = self._client.scroll(
+            collection_name=app_settings.DB_COLLECTION,
+            scroll_filter=scroll_filter,
+            with_payload=["content", "source_document", "index", "collection", "section_title"],
+            with_vectors=False,
+            limit=1,
+        )
+
+        return points[0] if points else None

@@ -27,13 +27,13 @@ sql_database_path = Path.cwd().parent / "mediassist_data" / "db" / "mediassist.d
 class AppContainer(DeclarativeContainer):
     """Provide application services through dependency injection."""
 
-    database_path = Object(db_path)
-    sqlite_db = Singleton(SQLiteDB, db_path=database_path)
-    user_service = Singleton(UserService, sqlite_db=sqlite_db)
+    my_database_path = Object(db_path)
+    my_sqlite_db = Singleton(SQLiteDB, db_path=my_database_path)
+    user_service = Singleton(UserService, sqlite_db=my_sqlite_db)
     auth_service = Singleton(AuthService, user_service=user_service)
 
-    sql_database_path = Object(sql_database_path)
-    sql_db = Singleton(SQLiteDB, db_path=sql_database_path)
+    mediassist_sql_database_path = Object(sql_database_path)
+    mediassist_sql_db = Singleton(SQLiteDB, db_path=mediassist_sql_database_path)
     sql_rag = Singleton(SqlRAG)
 
     file_store = Singleton(FileStore)
@@ -47,13 +47,13 @@ class AppContainer(DeclarativeContainer):
         vector_db=vector_db,
     )
 
-    llm_chat = Singleton(LLMChat, sql_db=sql_db)
+    llm_chat = Singleton(LLMChat, sql_db=my_sqlite_db)
     semantic_router = Singleton(SemanticRouter)
     prompt_handler = Singleton(PromptHandler)
     retriever = Singleton(
         Retriever,
         vector_db=vector_db,
-        sql_db=sql_db,
+        sql_db=mediassist_sql_db,
         sql_rag=sql_rag,
     )
     medi_bot = Singleton(
