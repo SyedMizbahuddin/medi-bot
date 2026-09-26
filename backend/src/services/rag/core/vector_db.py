@@ -18,6 +18,7 @@ from qdrant_client.models import (
     Filter,
     FieldCondition,
     MatchAny, HasIdCondition,
+    PayloadSchemaType,
 )
 from src.services.rag.core.embedder import Embedder
 from src.config.app_config import app_settings
@@ -48,7 +49,16 @@ class VectorDB:
             sparse_vectors_config={"sparse": SparseVectorParams(modifier=Modifier.IDF)},
         )
         logger.info("Initialized Qdrant collection %s", app_settings.DB_COLLECTION)
-        #TODO indexing
+        # All filtered retrieval paths use access_roles: retrieve() applies it
+        # to dense and sparse prefetches, and retrieve_chunk() applies it
+        # alongside the point-ID condition.
+        logger.info("Creating payload index for access_roles")
+        self._client.create_payload_index(
+            collection_name=app_settings.DB_COLLECTION,
+            field_name="access_roles",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
+        logger.info("Created payload index for access_roles")
 
     def _create_point_id(self, ind: int, doc: Document) -> str:
         """Create a deterministic point ID for a document chunk."""
