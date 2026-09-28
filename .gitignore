@@ -19,7 +19,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/
 lib64/
 parts/
 sdist/
@@ -170,5 +170,43 @@ cython_debug/
 .vscode
 **/test/**
 
+
+node_modules
+
+# build directories
+dist
+pkg
+static/js/
+static/css/
+
+# log files
+*.log
+
+# package locks
+yarn.lock
+#package-lock.json
+jsconfig.json
+
+#python
+ __pycache__/
+*.pyc
+
+/.env
+
+/.vscode
+/pkg
+
+demo*
+
+.next/
+static/*
+
+env.sh
+
 vector_db
 sql_db
+
+
+
+
+.env.local
