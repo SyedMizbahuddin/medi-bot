@@ -30,4 +30,6 @@ dependencies = [
     "uvicorn[standard]>=0.30.0",
     "pydash>=8.1.0",
     "langgraph-checkpoint-sqlite>=3.1.1",
+    "semantic-router[local]>=0.1.16",
+    "langchain-community>=0.4.2",
 ]

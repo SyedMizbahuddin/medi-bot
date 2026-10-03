@@ -49,6 +49,7 @@ class RouteCategory(str, Enum):
     SQL = "sql"
     VECTOR_DB = "vector-db"
     FOLLOW_UP = "follow-up"
+    UNRELATED = "unrelated"
 
 
 def can_access(role: Role, collection: SourceCollection) -> bool:

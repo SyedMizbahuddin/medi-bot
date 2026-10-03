@@ -1,3 +1,4 @@
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,6 +12,13 @@ class _Settings(BaseSettings):
     JWT_SECRET: str = "change-this-development-secret-32"
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRY_DAYS: int = 365
+    
+    CURRENT_DIR: Path = Path().cwd()
+    CHUNKS_DIR: Path = CURRENT_DIR.parent / "cache_chunk_data"
+    
+    ROUTER_DIR: Path = CHUNKS_DIR / "semantic_router"
+    
+    VECTOR_DB_PATH: Path = CURRENT_DIR.parent / "vector_db"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

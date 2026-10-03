@@ -1,3 +1,4 @@
+from src.config.app_config import app_settings
 import shutil
 from qdrant_client.models import SparseVector
 import logging
@@ -11,8 +12,7 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-CURRENT_DIR: Path = Path().cwd()
-CHUNKS_DIR: Path = CURRENT_DIR.parent / "cache_chunk_data"
+
 # CHUNKS_EMBEDDING_DIR = CHUNKS_DIR / app_settings.EMBEDDING_MODEL
 
 CHUNK_FILE = "chunks.parquet"
@@ -32,7 +32,7 @@ class FileStore(Store):
         """Return and create the cache directory for a source file."""
         group = file_path.parent.name
 
-        group_dir = CHUNKS_DIR / group
+        group_dir = app_settings.CHUNKS_DIR / group
         file_name = file_path.stem
 
         # chunk_data/embedding-model/nursing/infection_control/
@@ -175,6 +175,6 @@ class FileStore(Store):
 
     def clear_cache(self) -> None:
         logger.info("Clearing cache")
-        if CHUNKS_DIR.exists():
-            shutil.rmtree(CHUNKS_DIR)
+        if app_settings.CHUNKS_DIR.exists():
+            shutil.rmtree(app_settings.CHUNKS_DIR)
         logger.info("Cleared cache")

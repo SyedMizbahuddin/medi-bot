@@ -4,7 +4,7 @@ from typing import Any
 from src.services.rag.generate.prompt_handler import PromptHandler
 from src.services.rag.retrieve.retriever import Retriever
 from src.utils.constants import Role, RouteCategory
-from src.services.rag.retrieve.semantic_router import SemanticRouter
+from src.services.rag.retrieve.semantic_router import MySemanticRouter
 from src.services.rag.generate.llm_chat import LLMChat
 
 
@@ -21,7 +21,7 @@ class MediBot:
     def __init__(
         self,
         chat_bot: LLMChat,
-        semantic_router: SemanticRouter,
+        semantic_router: MySemanticRouter,
         retriever: Retriever,
         prompt_handler: PromptHandler,
     ):

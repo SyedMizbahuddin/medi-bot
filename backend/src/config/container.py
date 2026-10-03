@@ -12,8 +12,9 @@ from src.services.rag.generate.llm_chat import LLMChat
 from src.services.rag.generate.medi_bot import MediBot
 from src.services.rag.generate.prompt_handler import PromptHandler
 from src.services.rag.retrieve.retriever import Retriever
-from src.services.rag.retrieve.semantic_router import SemanticRouter
-from src.services.rag.retrieve.sql_rag_agent import SqlRAG
+from src.services.rag.retrieve.semantic_router import MySemanticRouter
+from src.services.rag.retrieve.sql_rag_agent import SqlAgent
+from src.helpers.llm import llm
 from src.services.rag.core.store.file_store import FileStore
 from src.services.sqlite_db import SQLiteDB
 from src.services.api.user_service import UserService
@@ -34,7 +35,12 @@ class AppContainer(DeclarativeContainer):
 
     mediassist_sql_database_path = Object(sql_database_path)
     mediassist_sql_db = Singleton(SQLiteDB, db_path=mediassist_sql_database_path)
-    sql_rag = Singleton(SqlRAG)
+    llm_model = Object(llm)
+    sql_rag = Singleton(
+        SqlAgent,
+        sqlite_db=mediassist_sql_db,
+        language_model=llm_model,
+    )
 
     file_store = Singleton(FileStore)
     embedder = Singleton(Embedder, store=file_store)
@@ -48,7 +54,7 @@ class AppContainer(DeclarativeContainer):
     )
 
     llm_chat = Singleton(LLMChat, sql_db=my_sqlite_db)
-    semantic_router = Singleton(SemanticRouter)
+    semantic_router = Singleton(MySemanticRouter)
     prompt_handler = Singleton(PromptHandler)
     retriever = Singleton(
         Retriever,

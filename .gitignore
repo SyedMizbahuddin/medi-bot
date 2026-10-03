@@ -210,3 +210,6 @@ sql_db
 
 
 .env.local
+
+
+cache_chunk_data/semantic_router/

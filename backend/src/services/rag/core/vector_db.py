@@ -22,12 +22,9 @@ from qdrant_client.models import (
 )
 from src.services.rag.core.embedder import Embedder
 from src.config.app_config import app_settings
-from pathlib import Path
 from qdrant_client import QdrantClient
 
 
-CURRENT_DIR: Path = Path().cwd()
-DB_PATH: Path = CURRENT_DIR.parent / "vector_db"
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +32,7 @@ logger = logging.getLogger(__name__)
 class VectorDB:
     def __init__(self, embedder: Embedder) -> None:
         """Initialize a local Qdrant client and retain the dense embedder."""
-        self._client = QdrantClient(path=str(DB_PATH))
+        self._client = QdrantClient(path=str(app_settings.VECTOR_DB_PATH))
         self._embedder = embedder
 
     def recreate_collection(self) -> None:

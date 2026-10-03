@@ -1,6 +1,6 @@
 from src.config.app_config import app_settings
 from typing import Any
-from src.services.rag.retrieve.sql_rag_agent import SqlRAG
+from src.services.rag.retrieve.sql_rag_agent import SqlAgent
 from src.utils.constants import Role, RouteCategory
 from langchain_core.documents import Document
 from src.services.sqlite_db import SQLiteDB
@@ -12,7 +12,7 @@ class Retriever:
         self,
         vector_db: VectorDB,
         sql_db: SQLiteDB,
-        sql_rag: SqlRAG,
+        sql_rag: SqlAgent,
     ):
         self.vector_db = vector_db
         self.sql_db = sql_db
@@ -54,7 +54,9 @@ class Retriever:
         
         return new_docs_ordered
 
-    def query_sql_db(self, query: str, role: Role) -> Any: ...
+    def query_sql_db(self, query: str, role: Role) -> str:
+        """Run an analytical query through the injected SQL agent."""
+        return self.sql_rag.query(query, role)
 
     def query_follow_up(
         self,
